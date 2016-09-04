@@ -1,0 +1,7 @@
+main: me.MrStein.BlacklistCommands.BLCMDPlugin
+name: BlacklistCommands
+version: 1.0
+author: MrStein
+
+commands:
+  blcmd:

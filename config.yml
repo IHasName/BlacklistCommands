@@ -1,0 +1,10 @@
+# BlacklistCommands - Config
+# 
+# Permissions:
+#   blacklist.add     Add a Command to the Blacklist
+#   blacklist.remove  Remove a Command from Blacklist
+#   blacklist.reload  Reload Configs from the Plugin
+#   blacklist.bypass  Let's the Player Perform the Command even when it's Blacklisted
+#   blacklist.get     Shows you a List of Blacklisted Commands
+
+message: "You don't have Permission to do that!"

@@ -1,0 +1,6 @@
+# All Blacklisted Commands are stored in this Config
+# Add some here or use /blcmd add [some command]
+# To remove a Command use /blcmd remove [some command]
+
+blacklisted:
+- help
