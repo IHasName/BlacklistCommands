@@ -1,6 +1,6 @@
 # All Blacklisted Commands are stored in this Config
-# Add some here or use /blcmd add [some command]
+# Add some here or use /blcmd add [some command] [custommessage]
 # To remove a Command use /blcmd remove [some command]
 
 blacklisted:
-- help
+  help: "&cYou don't have Permission to do that!"

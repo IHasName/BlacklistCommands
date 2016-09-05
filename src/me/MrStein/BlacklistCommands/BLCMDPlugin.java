@@ -38,7 +38,7 @@ public class BLCMDPlugin extends JavaPlugin implements Listener, CommandExecutor
 				s.sendMessage("You don't have Permission to use this Command");
 			}
 			if (args.length == 0) {
-				s.sendMessage("§cNot enough Arguments\n/blcmd <add, remove, reload> <[command]>");
+				s.sendMessage("§cNot enough Arguments\n/blcmd <add, remove, reload> <[command]> <[CustomMessage]>");
 				return true;
 			}
 			if (args[0].equalsIgnoreCase("add")) {
@@ -47,13 +47,27 @@ public class BLCMDPlugin extends JavaPlugin implements Listener, CommandExecutor
 					return true;
 				}
 				if(args.length <= 1) {
-					s.sendMessage("§cNot enough Arguments\n/blcmd add <command>");
+					s.sendMessage("§cNot enough Arguments\n/blcmd add <command> <[CustomMessage]>");
 					return true;
 				}
-				List<String> list = Configs.getBlacklist(this).getStringList("blacklisted");
-				list.add(args[1]);
-				Configs.getBlacklist(this).set("blacklisted", list);
-				s.sendMessage("§e/" + args[1] + " §7added!");
+				String msg = "";
+				if(args.length <= 2) {
+					msg += Configs.getConfig(this).getString("defaultmessage");
+					s.sendMessage("§7No Message provided. Using defaultmessage instead");
+				}else{
+					for(int i = 2; i < args.length; i++) {
+						msg += args[i] + " ";
+					}
+				}
+				if(Configs.getBlacklist(this).getConfigurationSection("blacklisted").getKeys(false).contains(args[1])) {
+					s.sendMessage("§e /" + args[1] + " §7has been edited!");
+					s.sendMessage("§7Before: §r" + format(Configs.getBlacklist(this).getString("blacklisted." + args[1])));
+					s.sendMessage("§7After: §r" + format(msg));
+				}else{
+					s.sendMessage("§e /" + args[1] + " §7has been added!");
+					s.sendMessage("§7Message: §r" + format(msg));
+				}
+				Configs.getBlacklist(this).set("blacklisted." + args[1], msg);
 				Configs.saveBlacklist(this);
 			}
 			if(args[0].equalsIgnoreCase("remove")) {
@@ -61,19 +75,18 @@ public class BLCMDPlugin extends JavaPlugin implements Listener, CommandExecutor
 					s.sendMessage("You don't have Permission to use this Command");
 					return true;
 				}
-				if(args.length <= 1) {
+				if(args.length < 1) {
 					s.sendMessage("§cNot enough Arguments\n/blcmd remove <command>");
 					return true;
 				}
-				List<String> list = Configs.getBlacklist(this).getStringList("blacklisted");
-				if(list.contains(args[1])) {
-					list.remove(args[1]);
-					s.sendMessage("§e/" + args[1] + " §7removed!");
-					Configs.getBlacklist(this).set("blacklisted", list);
+				if(Configs.getBlacklist(this).getConfigurationSection("blacklisted").getKeys(false).contains(args[1])) {
+					Configs.getBlacklist(this).set("blacklisted." + args[1], null);
+//					list.remove(args[1]);
+					s.sendMessage("§e /" + args[1] + " §7has been removed!");
 					Configs.saveBlacklist(this);
 					return true;
 				}
-				s.sendMessage("§e/" + args[1] + " §7couldn't be found");
+				s.sendMessage("§e /" + args[1] + " §7couldn't be found");
 			}
 			if (args[0].equalsIgnoreCase("get")) {
 				if(!s.hasPermission("blacklist.get")) {
@@ -81,8 +94,8 @@ public class BLCMDPlugin extends JavaPlugin implements Listener, CommandExecutor
 					return true;
 				}
 				s.sendMessage("§cThese are the currnetly Blacklisted Commands:");
-				for (String list : Configs.getBlacklist(this).getStringList("blacklisted")) {
-					s.sendMessage("§7- /" + list);
+				for(String key : Configs.getBlacklist(this).getConfigurationSection("blacklisted").getKeys(false)) {
+					s.sendMessage("§7- /" + key + " - §r" + format(Configs.getBlacklist(this).getString("blacklisted." + key)));
 				}
 			}
 			if(args[0].equalsIgnoreCase("reload")) {
@@ -103,9 +116,9 @@ public class BLCMDPlugin extends JavaPlugin implements Listener, CommandExecutor
 	public void command(PlayerCommandPreprocessEvent e) {
 		Player p = e.getPlayer();
 		String[] args = e.getMessage().split(" ");
-		for (String list : Configs.getBlacklist(this).getStringList("blacklisted")) {
+		for(String list : Configs.getBlacklist(this).getConfigurationSection("blacklisted").getKeys(false)) {
 			if (args[0].equalsIgnoreCase("/" + list) && !p.hasPermission("blacklist.bypass")) {
-				p.sendMessage(format(Configs.getConfig(this).getString("message")));
+				p.sendMessage(format(Configs.getBlacklist(this).getString("blacklisted." + list)));
 				e.setCancelled(true);
 				return;
 			}
